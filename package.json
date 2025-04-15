@@ -4,13 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "homepage": "https://Ragee1999.github.io/pokedex-app",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "lint": "eslint .",
-    "predeploy": "vite build",
-    "deploy": "gh-pages -d dist"
+
+"scripts": {
+  "dev": "vite",
+  "build": "vite build",
+  "preview": "vite preview",
+  "lint": "eslint ."
+
   },
   "dependencies": {
     "react": "^19.0.0",
