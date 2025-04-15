@@ -12,20 +12,34 @@ function Pokedex() {
   const [currentPage, setCurrentPage] = useState(0);
 
   useEffect(() => {
-    async function fetchAllPokemon() {
+    async function fetchFirstPage() {
       setLoading(true);
-      const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
-      const data = await res.json();
 
-      const detailed = await Promise.all(
+      const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=15');
+      const data = await res.json();
+      const firstDetailed = await Promise.all(
         data.results.map(p => fetch(p.url).then(res => res.json()))
       );
 
-      setAllPokemon(detailed);
+      setAllPokemon(firstDetailed);
       setLoading(false);
+
+      // Start background loading
+      fetchRemaining();
     }
 
-    fetchAllPokemon();
+    async function fetchRemaining() {
+      const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
+      const data = await res.json();
+
+      const allDetailed = await Promise.all(
+        data.results.map(p => fetch(p.url).then(res => res.json()))
+      );
+
+      setAllPokemon(allDetailed);
+    }
+
+    fetchFirstPage();
   }, []);
 
   useEffect(() => {
@@ -34,10 +48,9 @@ function Pokedex() {
       (typeFilter === '' || p.types.some(t => t.type.name === typeFilter))
     );
     setFiltered(filteredList);
-    setCurrentPage(0); 
+    setCurrentPage(0);
   }, [search, typeFilter, allPokemon]);
 
- 
   const paginated = filtered.slice(
     currentPage * POKEMON_LIMIT,
     (currentPage + 1) * POKEMON_LIMIT
@@ -63,23 +76,13 @@ function Pokedex() {
           className="px-4 py-2 rounded-md text-black w-full sm:w-48"
         >
           <option value="">All Types</option>
-          <option value="grass">Grass</option>
-          <option value="fire">Fire</option>
-          <option value="water">Water</option>
-          <option value="bug">Bug</option>
-          <option value="poison">Poison</option>
-          <option value="flying">Flying</option>
-          <option value="normal">Normal</option>
-          <option value="electric">Electric</option>
-          <option value="fairy">Fairy</option>
-          <option value="psychic">Psychic</option>
-          <option value="rock">Rock</option>
-          <option value="ghost">Ghost</option>
-          <option value="dark">Dark</option>
-          <option value="steel">Steel</option>
-          <option value="ice">Ice</option>
-          <option value="dragon">Dragon</option>
-          <option value="fighting">Fighting</option>
+          {[
+            'grass', 'fire', 'water', 'bug', 'poison', 'flying', 'normal',
+            'electric', 'fairy', 'psychic', 'rock', 'ghost', 'dark', 'steel',
+            'ice', 'dragon', 'fighting'
+          ].map(type => (
+            <option key={type} value={type}>{type}</option>
+          ))}
         </select>
       </div>
 
@@ -93,7 +96,6 @@ function Pokedex() {
             ))}
           </div>
 
-          {/* Pagination Buttons */}
           <div className="flex justify-center mt-10 gap-4">
             <button
               disabled={currentPage === 0}
@@ -128,3 +130,4 @@ function Pokedex() {
 }
 
 export default Pokedex;
+
